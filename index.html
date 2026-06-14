@@ -388,6 +388,51 @@
       margin-top: 12px;
     }
 
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .info-card {
+      display: grid;
+      gap: 8px;
+      min-height: 142px;
+      align-content: start;
+    }
+
+    .info-card strong {
+      font-size: 18px;
+    }
+
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .template-btn {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcff;
+      color: var(--ink);
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      min-height: 74px;
+    }
+
+    .template-btn strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .template-btn span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
     @media (max-width: 900px) {
       .shell { grid-template-columns: 1fr; }
       aside {
@@ -401,6 +446,7 @@
       .voice-wrap { grid-template-columns: 1fr; }
       .voice-btn { min-height: 40px; width: 100%; }
       h2 { font-size: 25px; }
+      .template-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -436,7 +482,11 @@
         <div class="header">
           <div>
             <h2>Преврати любую цель в систему на каждый день</h2>
-            <p class="subtitle">Это приложение для человека, который хочет не просто мечтать, а каждый день входить в нужное состояние, делать правильный шаг и видеть факты прогресса.</p>
+            <p class="subtitle">Creator OS помогает человеку выбрать одну важную цель, настроить ежедневный ритм, проходить чек-лист перед действиями и видеть факты прогресса в журнале.</p>
+            <div class="hero-actions">
+              <button class="btn" data-go="goal">Начать настройку</button>
+              <button class="btn secondary" data-go="install">Установить на телефон</button>
+            </div>
           </div>
           <span class="pill green">PWA для телефона</span>
         </div>
@@ -460,17 +510,34 @@
           </div>
 
           <div class="panel">
-            <h3>Как начать за 3 минуты</h3>
+            <h3>Как пользоваться каждый день</h3>
             <ol class="small">
-              <li>Открой раздел <strong>Цель</strong> и выбери сферу.</li>
-              <li>Запиши результат простыми словами.</li>
-              <li>Если цель денежная, выбери валюту: рубль, доллар или евро.</li>
-              <li>Каждый день открывай раздел <strong>День</strong>.</li>
-              <li>Перед важным шагом открывай <strong>Действие</strong>.</li>
-              <li>Вечером заполняй <strong>Журнал</strong>.</li>
+              <li>Один раз заполни раздел <strong>Цель</strong>.</li>
+              <li>Утром открой <strong>День</strong> и настрой состояние.</li>
+              <li>Перед важным шагом открой <strong>Действие</strong>.</li>
+              <li>После шага запиши факт в <strong>Журнал</strong>.</li>
+              <li>Раз в неделю открой <strong>Разбор</strong> и выбери одно улучшение.</li>
             </ol>
             <div class="divider"></div>
             <div class="script" id="userPromise">Я выбираю одну цель и превращаю ее в систему. Сегодня мне не нужно быть идеальным. Мне нужно сделать один честный шаг.</div>
+          </div>
+        </div>
+
+        <div class="grid three" style="margin-top:16px">
+          <div class="panel info-card">
+            <span class="pill">Для кого</span>
+            <strong>Для тех, кто хочет не просто “хотеть”, а двигаться</strong>
+            <p class="small">Деньги, здоровье, бизнес, обучение, дисциплина, творчество, отношения или личная практика.</p>
+          </div>
+          <div class="panel info-card">
+            <span class="pill green">Через 30 дней</span>
+            <strong>У человека будет история фактов</strong>
+            <p class="small">Что он делал, что мешало, какое состояние помогало и какой следующий шаг реально работает.</p>
+          </div>
+          <div class="panel info-card">
+            <span class="pill amber">Приватность</span>
+            <strong>Данные остаются на устройстве</strong>
+            <p class="small">Если другой человек откроет эту же ссылку, у него будет чистая версия приложения и свои записи.</p>
           </div>
         </div>
       </section>
@@ -487,6 +554,12 @@
         <div class="grid two">
           <div class="panel">
             <h3>Главное</h3>
+            <div class="template-grid" style="margin-bottom:16px">
+              <button class="template-btn" data-template="money"><strong>Деньги</strong><span>Накопить, увеличить доход, выйти на сумму.</span></button>
+              <button class="template-btn" data-template="health"><strong>Здоровье</strong><span>Привычки, энергия, питание, сон.</span></button>
+              <button class="template-btn" data-template="business"><strong>Бизнес</strong><span>Клиенты, продажи, запуск проекта.</span></button>
+              <button class="template-btn" data-template="learning"><strong>Обучение</strong><span>Курс, навык, язык, практика.</span></button>
+            </div>
             <div class="grid two">
               <label>Сфера
                 <select id="area">
@@ -853,6 +926,80 @@
         document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
         btn.classList.add("active");
         document.getElementById(btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    function goTo(tab) {
+      const button = document.querySelector(`.nav-btn[data-tab="${tab}"]`);
+      if (button) button.click();
+    }
+
+    document.querySelectorAll("[data-go]").forEach(btn => {
+      btn.addEventListener("click", () => goTo(btn.dataset.go));
+    });
+
+    const goalTemplates = {
+      money: {
+        area: "Деньги",
+        period: 30,
+        currency: "RUB",
+        currentValue: 0,
+        targetValue: 100000,
+        unit: "₽",
+        goalText: "За 30 дней создать измеримый финансовый результат.",
+        whyText: "Мне важно управлять деньгами спокойнее, видеть факты и делать ежедневные действия, которые увеличивают доход.",
+        dailyAction: "Каждый день сделать одно действие, связанное с доходом: предложение, звонок, анализ, публикация, сделка или улучшение продукта.",
+        oldPattern: "Ждать идеального момента, откладывать действия, менять цель каждый день.",
+        newIdentity: "Я человек, который спокойно создает финансовый результат через ежедневные действия."
+      },
+      health: {
+        area: "Здоровье",
+        period: 30,
+        currency: "RUB",
+        currentValue: 0,
+        targetValue: 30,
+        unit: "дней",
+        goalText: "За 30 дней укрепить здоровье через ежедневные базовые привычки.",
+        whyText: "Мне нужна энергия, ясность и ощущение, что тело работает вместе со мной.",
+        dailyAction: "Сделать минимальный набор: вода, движение, сон, питание или спокойная прогулка.",
+        oldPattern: "Жить рывками: один день идеально, потом несколько дней ничего.",
+        newIdentity: "Я человек, который заботится о теле каждый день маленькими устойчивыми действиями."
+      },
+      business: {
+        area: "Бизнес",
+        period: 90,
+        currency: "RUB",
+        currentValue: 0,
+        targetValue: 10,
+        unit: "клиентов",
+        goalText: "За 90 дней получить измеримый бизнес-результат через системные действия.",
+        whyText: "Мне важно не просто думать о проекте, а регулярно создавать предложения, контакты и продажи.",
+        dailyAction: "Каждый день сделать одно бизнес-действие: написать клиенту, улучшить оффер, опубликовать материал или разобрать воронку.",
+        oldPattern: "Заниматься только подготовкой и не выходить к людям с предложением.",
+        newIdentity: "Я человек, который каждый день продвигает свой проект на один реальный шаг."
+      },
+      learning: {
+        area: "Обучение",
+        period: 30,
+        currency: "RUB",
+        currentValue: 0,
+        targetValue: 30,
+        unit: "занятий",
+        goalText: "За 30 дней пройти учебный ритм и закрепить новый навык.",
+        whyText: "Мне важно не просто собрать материалы, а реально освоить навык через практику.",
+        dailyAction: "Каждый день пройти один урок, упражнение, повторение или практический блок.",
+        oldPattern: "Потреблять информацию без закрепления и бросать после первых трудностей.",
+        newIdentity: "Я человек, который учится через ежедневную практику, а не через ожидание мотивации."
+      }
+    };
+
+    document.querySelectorAll("[data-template]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const template = goalTemplates[btn.dataset.template];
+        if (!template) return;
+        state.goal = { ...state.goal, ...template };
+        renderGoalForm();
+        renderDashboard();
       });
     });
 
