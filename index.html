@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
@@ -433,6 +433,32 @@
       font-size: 13px;
     }
 
+    .image-preview {
+      min-height: 260px;
+      border: 1px dashed #aab6c8;
+      border-radius: 8px;
+      background: #f8fbff;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--muted);
+      text-align: center;
+      padding: 12px;
+    }
+
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      max-height: 520px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .prompt-box {
+      min-height: 180px;
+      white-space: pre-wrap;
+    }
+
     @media (max-width: 900px) {
       .shell { grid-template-columns: 1fr; }
       aside {
@@ -464,6 +490,7 @@
         <button class="nav-btn active" data-tab="about">О системе</button>
         <button class="nav-btn" data-tab="start">Старт</button>
         <button class="nav-btn" data-tab="goal">Цель</button>
+        <button class="nav-btn" data-tab="vision">Образ</button>
         <button class="nav-btn" data-tab="daily">День</button>
         <button class="nav-btn" data-tab="action">Действие</button>
         <button class="nav-btn" data-tab="journal">Журнал</button>
@@ -709,6 +736,85 @@
             <label>Фраза новой версии
               <textarea id="newIdentity" placeholder="Например: я человек, который держит слово перед собой."></textarea>
             </label>
+          </div>
+        </div>
+      </section>
+
+      <section id="vision" class="section">
+        <div class="header">
+          <div>
+            <h2>Образ цели</h2>
+            <p class="subtitle">Это современная “доска желания”, но с фокусом на одну цель: будущая сцена, эмоциональное состояние, визуальный якорь и конкретное действие на сегодня.</p>
+          </div>
+          <button class="btn" id="saveVision">Сохранить образ</button>
+        </div>
+
+        <div class="grid two">
+          <div class="panel">
+            <h3>Сцена будущей версии</h3>
+            <label>Где я нахожусь
+              <textarea id="visionLocation" placeholder="Город, страна, дом, офис, природа, пространство, атмосфера."></textarea>
+            </label>
+            <label>Как я выгляжу
+              <textarea id="visionLook" placeholder="Одежда, возраст, осанка, энергия, стиль, детали внешности."></textarea>
+            </label>
+            <label>В каком я состоянии
+              <textarea id="visionState" placeholder="Спокойствие, уверенность, свобода, благодарность, сила, ясность."></textarea>
+            </label>
+            <label>Что вокруг подтверждает, что цель уже реализована
+              <textarea id="visionProof" placeholder="Детали результата: место, люди, цифры, предметы, документы, символы, образ жизни."></textarea>
+            </label>
+            <label>Стиль изображения
+              <select id="visionStyle">
+                <option>Фотореалистичный кинематографичный кадр</option>
+                <option>Премиальная lifestyle-фотография</option>
+                <option>Редакционная обложка журнала</option>
+                <option>Мягкий вдохновляющий реализм</option>
+                <option>Документальный реализм</option>
+              </select>
+            </label>
+            <label>Формат
+              <select id="visionAspect">
+                <option value="vertical">Вертикальный 9:16 для телефона</option>
+                <option value="square">Квадрат 1:1</option>
+                <option value="wide">Широкий 16:9</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="panel">
+            <h3>Визуальный якорь</h3>
+            <div class="image-preview" id="visionPreview">Загрузи сгенерированную картинку или свое фото будущего образа</div>
+            <div class="row" style="margin-top:12px">
+              <input id="visionImage" type="file" accept="image/*">
+              <button class="btn secondary" id="clearVisionImage" type="button">Убрать картинку</button>
+            </div>
+            <div class="divider"></div>
+            <label>Действие, которое подтверждает этот образ сегодня
+              <textarea id="visionAction" placeholder="Какой один шаг сегодня делает эту будущую реальность ближе?"></textarea>
+            </label>
+            <div class="script">
+              Визуализация работает сильнее, когда она заканчивается действием. Образ не заменяет шаг, он помогает выбрать шаг из будущей версии себя.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid two" style="margin-top:16px">
+          <div class="panel">
+            <h3>Промпт для ChatGPT Image 2</h3>
+            <textarea id="chatgptPrompt" class="prompt-box" readonly></textarea>
+            <div class="row" style="margin-top:12px">
+              <button class="btn" id="buildPrompt" type="button">Собрать промпт</button>
+              <button class="btn secondary" data-copy="chatgptPrompt" type="button">Копировать</button>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Промпт для Reve</h3>
+            <textarea id="revePrompt" class="prompt-box" readonly></textarea>
+            <div class="row" style="margin-top:12px">
+              <button class="btn secondary" data-copy="revePrompt" type="button">Копировать</button>
+            </div>
+            <p class="small">Если используешь фото себя как референс, загрузи его в генератор отдельно и попроси сохранить узнаваемость, возраст, черты лица и естественность.</p>
           </div>
         </div>
       </section>
@@ -961,6 +1067,16 @@
         oldPattern: "",
         newIdentity: ""
       },
+      vision: {
+        location: "",
+        look: "",
+        state: "",
+        proof: "",
+        style: "Фотореалистичный кинематографичный кадр",
+        aspect: "vertical",
+        action: "",
+        image: ""
+      },
       dailyDates: [],
       entries: [],
       review: { reviewWins: "", reviewBlocks: "", reviewRule: "" },
@@ -1126,6 +1242,98 @@
       saveState();
     });
 
+    document.getElementById("saveVision").addEventListener("click", () => {
+      state.vision = {
+        ...state.vision,
+        location: getValue("visionLocation"),
+        look: getValue("visionLook"),
+        state: getValue("visionState"),
+        proof: getValue("visionProof"),
+        style: getValue("visionStyle"),
+        aspect: getValue("visionAspect"),
+        action: getValue("visionAction")
+      };
+      buildVisionPrompts();
+      saveState();
+    });
+
+    function renderVisionForm() {
+      setValue("visionLocation", state.vision.location);
+      setValue("visionLook", state.vision.look);
+      setValue("visionState", state.vision.state);
+      setValue("visionProof", state.vision.proof);
+      setValue("visionStyle", state.vision.style);
+      setValue("visionAspect", state.vision.aspect);
+      setValue("visionAction", state.vision.action);
+      renderVisionImage();
+      buildVisionPrompts();
+    }
+
+    function aspectText() {
+      if (state.vision.aspect === "square") return "square 1:1";
+      if (state.vision.aspect === "wide") return "wide 16:9";
+      return "vertical 9:16 smartphone wallpaper";
+    }
+
+    function buildVisionPrompts() {
+      const goal = state.goal.goalText || "моя главная цель уже реализована";
+      const location = getValue("visionLocation") || state.vision.location || "место, где моя цель уже стала реальностью";
+      const look = getValue("visionLook") || state.vision.look || "я выгляжу спокойно, уверенно и естественно";
+      const feeling = getValue("visionState") || state.vision.state || "состояние ясности, силы, благодарности и внутренней свободы";
+      const proof = getValue("visionProof") || state.vision.proof || "вокруг видны конкретные детали достигнутого результата";
+      const style = getValue("visionStyle") || state.vision.style || "Фотореалистичный кинематографичный кадр";
+      const aspect = aspectText();
+
+      const chatgptPrompt = `Создай ${style.toLowerCase()} в формате ${aspect}.\n\nСцена: будущая версия меня уже реализовала цель: ${goal}.\nЛокация: ${location}.\nВнешний образ: ${look}.\nВнутреннее состояние должно читаться через позу, взгляд и атмосферу: ${feeling}.\nДетали, подтверждающие результат: ${proof}.\n\nСделай изображение реалистичным, эмоционально сильным, без фантастических эффектов и без лишнего текста на картинке. Важен не пафос, а ощущение: это моя новая нормальная реальность. Композиция должна работать как ежедневный визуальный якорь для фокуса и действия.`;
+      const revePrompt = `${style}. Future-self visualization image. The person is living the achieved goal: ${goal}. Location: ${location}. Appearance and clothing: ${look}. Emotional state: ${feeling}. Concrete proof details in the environment: ${proof}. Make it realistic, grounded, cinematic, emotionally clear, with natural light and strong composition. No extra text, no fantasy effects. Format: ${aspect}.`;
+
+      setValue("chatgptPrompt", chatgptPrompt);
+      setValue("revePrompt", revePrompt);
+    }
+
+    function renderVisionImage() {
+      const preview = document.getElementById("visionPreview");
+      if (!preview) return;
+      if (state.vision.image) {
+        preview.innerHTML = `<img src="${state.vision.image}" alt="Образ цели">`;
+      } else {
+        preview.textContent = "Загрузи сгенерированную картинку или свое фото будущего образа";
+      }
+    }
+
+    document.getElementById("buildPrompt").addEventListener("click", buildVisionPrompts);
+
+    document.querySelectorAll("[data-copy]").forEach(button => {
+      button.addEventListener("click", async () => {
+        const field = document.getElementById(button.dataset.copy);
+        if (!field) return;
+        try {
+          await navigator.clipboard.writeText(field.value);
+          button.textContent = "Скопировано";
+          setTimeout(() => button.textContent = "Копировать", 1200);
+        } catch {
+          field.select();
+          document.execCommand("copy");
+        }
+      });
+    });
+
+    document.getElementById("visionImage").addEventListener("change", event => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.vision.image = reader.result;
+        saveState();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById("clearVisionImage").addEventListener("click", () => {
+      state.vision.image = "";
+      document.getElementById("visionImage").value = "";
+      saveState();
+    });
     function renderGoalForm() {
       Object.entries(state.goal).forEach(([key, value]) => setValue(key, value));
     }
@@ -1394,6 +1602,7 @@
 
     function renderAll() {
       renderGoalForm();
+      renderVisionForm();
       renderDashboard();
       renderDailyStatus();
       renderGate();
@@ -1407,3 +1616,4 @@
   </script>
 </body>
 </html>
+
