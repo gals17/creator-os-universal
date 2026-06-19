@@ -375,6 +375,17 @@
     .table-wrap { overflow-x: auto; }
     .small { color: var(--muted); font-size: 13px; }
 
+    .save-hint {
+      min-height: 24px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      align-self: center;
+    }
+
+    .save-hint.good { color: var(--green); }
+    .save-hint.warn { color: var(--amber); }
+
     .script {
       border-left: 4px solid var(--blue);
       border-radius: 0 8px 8px 0;
@@ -813,7 +824,10 @@
             <h2>Настройка цели</h2>
             <p class="subtitle">Здесь человек задает свою реальность: что хочет получить, зачем это важно, как измерить результат и какой ежедневный шаг подтверждает выбор.</p>
           </div>
-          <button class="btn" id="saveGoal">Сохранить цель</button>
+          <div class="row">
+            <button class="btn" id="saveGoal">Сохранить цель</button>
+            <span class="save-hint" id="goalSaveStatus">Автосохранение включено</span>
+          </div>
         </div>
 
         <div class="grid two">
@@ -1273,6 +1287,17 @@
       renderAll();
     }
 
+    function persistStateOnly() {
+      localStorage.setItem(storeKey, JSON.stringify(state));
+    }
+
+    function showGoalSaveStatus(text, mode = "good") {
+      const status = document.getElementById("goalSaveStatus");
+      if (!status) return;
+      status.className = `save-hint ${mode}`;
+      status.textContent = text;
+    }
+
     function getValue(id) {
       return document.getElementById(id).value;
     }
@@ -1384,11 +1409,13 @@
         state.goal = { ...state.goal, ...template };
         renderGoalForm();
         renderDashboard();
+        persistStateOnly();
+        showGoalSaveStatus("Шаблон сохранён");
       });
     });
 
-    document.getElementById("saveGoal").addEventListener("click", () => {
-      state.goal = {
+    function collectGoalForm() {
+      return {
         area: getValue("area"),
         period: Number(getValue("period")) || 30,
         currency: getValue("currency"),
@@ -1401,7 +1428,39 @@
         oldPattern: getValue("oldPattern"),
         newIdentity: getValue("newIdentity")
       };
-      saveState();
+    }
+
+    function saveGoalForm({ render = true, label = "Цель сохранена" } = {}) {
+      try {
+        state.goal = collectGoalForm();
+        persistStateOnly();
+        renderDashboard();
+        buildVisionPrompts();
+        if (render) {
+          renderConsciousnessForm();
+          renderJournal();
+        }
+        const time = new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        showGoalSaveStatus(`${label}: ${time}`);
+      } catch {
+        showGoalSaveStatus("Не удалось сохранить. Проверь режим браузера.", "warn");
+      }
+    }
+
+    document.getElementById("saveGoal").addEventListener("click", () => {
+      saveGoalForm({ label: "Сохранено вручную" });
+    });
+
+    let goalAutoSaveTimer = null;
+    ["area", "period", "currency", "currentValue", "targetValue", "unit", "goalText", "whyText", "dailyAction", "oldPattern", "newIdentity"].forEach(id => {
+      const field = document.getElementById(id);
+      if (!field) return;
+      field.addEventListener("input", () => {
+        showGoalSaveStatus("Сохраняю...", "warn");
+        clearTimeout(goalAutoSaveTimer);
+        goalAutoSaveTimer = setTimeout(() => saveGoalForm({ render: false, label: "Автосохранено" }), 350);
+      });
+      field.addEventListener("change", () => saveGoalForm({ render: false, label: "Автосохранено" }));
     });
 
     document.getElementById("saveVision").addEventListener("click", () => {

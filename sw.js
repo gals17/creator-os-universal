@@ -1,4 +1,4 @@
-const CACHE_NAME = "creator-os-universal-v7";
+const CACHE_NAME = "creator-os-universal-v8";
 const FILES = [
   "./",
   "./index.html",
